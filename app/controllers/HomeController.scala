@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject._
-import play.api._
+
 import play.api.mvc._
 
 /**
@@ -18,7 +18,7 @@ class HomeController @Inject() extends Controller {
    * a path of `/`.
    */
   def index = Action {
-    Ok(views.html.index("One stop shop for all your data need."))
+    Ok(views.html.index("One stop shop for all your datacentral.data need."))
   }
 
 }
