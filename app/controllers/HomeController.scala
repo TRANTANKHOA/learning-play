@@ -18,7 +18,7 @@ class HomeController @Inject() extends Controller {
    * a path of `/`.
    */
   def index = Action {
-    Ok(views.html.index("One stop shop for all your datacentral.data need."))
+    Ok(scalaTags.utilities.index).as("text/html")
   }
 
 }

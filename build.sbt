@@ -11,6 +11,7 @@ libraryDependencies += cache
 libraryDependencies += ws
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
+libraryDependencies += "com.lihaoyi" %% "scalatags" % "0.6.3"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.0.1",
   "org.apache.spark" %% "spark-sql" % "2.0.1",
