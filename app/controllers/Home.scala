@@ -9,7 +9,7 @@ import play.api.mvc._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject() extends Controller {
+class Home @Inject() extends ImplicitController with Controller {
 
   /**
    * Create an Action to render an HTML page with a welcome message.
@@ -18,7 +18,7 @@ class HomeController @Inject() extends Controller {
    * a path of `/`.
    */
   def index = Action {
-    Ok(scalaTags.utilities.index).as("text/html")
+    Ok(scalatags.htmllib.index("Welcome you to Data Central"))
   }
 
 }
