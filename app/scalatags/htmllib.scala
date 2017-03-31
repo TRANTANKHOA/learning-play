@@ -59,13 +59,6 @@ object htmllib {
     )
   )
 
-  def imgBox(source: String, text: String): TypedTag[String] = div(
-    img(src := source),
-    div(
-      p(text)
-    )
-  )
-
   def page(title: String, scripts: Seq[Modifier], content: Seq[Modifier]): TypedTag[String] =
     html(
       head(scripts),
@@ -74,4 +67,8 @@ object htmllib {
         div(cls := "content")(content)
       )
     )
+
+  def addStyleSheetAt(url:String): TypedTag[String] = link(rel:="stylesheet", href:=url)
+
+
 }

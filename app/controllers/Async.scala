@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 
 import akka.actor.ActorSystem
+import common.ControllerWriters
 import play.api.mvc._
 
 import scala.concurrent.duration._
@@ -19,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * asynchronous code.
  */
 @Singleton
-class Async @Inject()(actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends ImplicitController with Controller {
+class Async @Inject()(actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends ControllerWriters with Controller {
 
   /**
    * Create an Action that returns a plain text message after a delay

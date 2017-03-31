@@ -1,11 +1,11 @@
-package controllers
+package common
 
 import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
 import play.api.mvc.Codec
 
 import scalatags.Text.all._
 
-trait ImplicitController {
+trait ControllerWriters {
   val htmlDocString = "<!DOCTYPE html>\n"
 
   implicit def contentTypeOfTag(implicit codec: Codec): ContentTypeOf[Tag] = {

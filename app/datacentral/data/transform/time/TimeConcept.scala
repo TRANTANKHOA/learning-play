@@ -6,11 +6,11 @@ import java.time.temporal.WeekFields
 import java.time.{LocalDate, LocalDateTime, ZoneId}
 import java.util.Locale
 
-import datacentral.data.transform.string.SmartStrings
+import datacentral.data.transform.sequence.Smart
 
 import scala.util.Random
 
-trait TimeConcept {
+trait TimeConcept extends Smart {
   // default formats
   val yyyyMMdd: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -20,8 +20,8 @@ trait TimeConcept {
 
   val yyyy: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy")
   // Time ranges
-  val years: SmartStrings = new SmartStrings fromSeq (2012 to 2016).map(_.toString)
-  val months: SmartStrings = new SmartStrings fromSeq Seq("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+  val years: Seq[String] = (2012 to 2016).map(_.toString)
+  val months: Seq[String] = Seq("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
   val mapMonth = Map(
     "jan" -> "01",
     "feb" -> "02",
@@ -85,7 +85,7 @@ trait TimeConcept {
 
   def asDateString(localDate: LocalDate = today, dateTimeFormatter: DateTimeFormatter = yyyyMMdd): String = localDate.format(dateTimeFormatter)
 
-  def getStandardDateStringFrom(date: String): String = (new Date fromString date).replaceNonAlphaNumeric.getStandardDateString
+  def getStandardDateStringFrom(date: String): String = date.replaceNonAlphaNumericWith("-").getStandardDateString
 
   // Test if the date related string is date month or year it is like given date are converted to standard format already
   def getDateTypeByStringLength(x: String): String = dateStringLengths.get(x.length) match {

@@ -1,22 +1,20 @@
 package datacentral.data.process
 
-class CachedFunctions[-T, +R](f: T => R) extends (T => R) {
+import scala.collection.concurrent.TrieMap
 
-  import scala.collection.mutable
+class CachedFunctions[-IN, +OUT](f: IN => OUT) extends (IN => OUT) {
 
-  private[this] val vals = mutable.Map.empty[T, R]
+  private[this] val cache = TrieMap.empty[IN, OUT]
 
-  def apply(x: T): R = {
-    if (vals.contains(x)) {
-      vals(x)
-    } else {
+  def apply(x: IN): OUT = {
+    cache.getOrElse(x, {
       val y = f(x)
-      vals += ((x, y))
+      cache += ((x, y))
       y
-    }
+    })
   }
 }
 
 object CachedFunctions {
-  def apply[T, R](f: T => R) = new CachedFunctions(f)
+  def apply[In, Out](f: In => Out) = new CachedFunctions(f)
 }
