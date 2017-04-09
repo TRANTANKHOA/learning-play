@@ -9,11 +9,22 @@ import scala.util.matching.Regex
 
 trait Smart {
 
-  implicit class Sequence[T](seq: Seq[T]) {
-    def getFirstAndLastElementsFrom: Seq[T] = if (seq.length > 1) {
-      Seq(seq.head, seq.last)
-    } else {
-      seq
+  implicit class Sequence[X](xs: Traversable[X]) {
+    def getFirstAndLastElementsFrom: Traversable[X] = if (xs.size > 1) Seq(xs.head, xs.last) else xs
+
+
+    def crossTupple[Y](ys: Traversable[Y]): Traversable[(X, Y)] = for {x <- xs; y <- ys} yield (x, y)
+
+    def cross(ys: Traversable[X]): Traversable[List[X]] = for {x <- xs; y <- ys} yield x :: y :: Nil
+  }
+
+  implicit class DoubleSequence[X](xss: Traversable[Traversable[X]]) {
+    def recursiveCross: Traversable[List[X]] = {
+      require(xss.size < 20)
+      xss match {
+        case Nil => List(Nil)
+        case head :: tail => for (xh <- head; xt <- tail.recursiveCross) yield xh :: xt
+      }
     }
   }
 
@@ -165,6 +176,7 @@ trait Smart {
         )
       else
         Seq.empty[LocalDate]
+
     def dateRange: Option[DateRange] = if (firstAndLastDates.nonEmpty)
       Some(DateRange(firstAndLastDates.head, firstAndLastDates.last))
     else
@@ -200,4 +212,5 @@ trait Smart {
       dates.distinct
     }
   }
+
 }

@@ -1,10 +1,19 @@
 package scalatags.LTETemplates
 
-import scalatags.LTETemplates.CSSskins.CSSskin
+import java.time.format.DateTimeFormatter
+import java.time.{Duration, LocalDate, LocalDateTime}
+
+import datacentral.data.transform.sequence.Smart
+
+import scala.util.Random
+import scalatags.LTETemplates.Skins.CSSskin
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
+import scalatags.css.BootStrapToggles
 
-object htmls {
+object htmls extends Smart {
+
+  val topOfPage = "#"
 
   val defMeta: Seq[TypedTag[String]] = Seq(
     meta(charset := "utf-8"),
@@ -12,209 +21,182 @@ object htmls {
     meta(content := "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no", name := "viewport")
   )
 
-  val defBodyScripts: Seq[TypedTag[String]] = Scripts.getAllValsAsInstancesOf[TypedTag[String]] toSeq
+  val scripts: Seq[TypedTag[String]] = Scripts.getAllValsAsInstancesOf[TypedTag[String]] toSeq
 
   val styleSheets: Seq[TypedTag[String]] = Stylesheets.getAllValsAsInstancesOf[TypedTag[String]] toSeq
 
-  def skin(`type`: CSSskin): TypedTag[String] = CSSskins.skin(`type`)
+  def skin(`type`: CSSskin = Skins.blue): TypedTag[String] = Skins.select(`type`)
 
-  def defHead(indexTitle: String, color: CSSskin): TypedTag[String] = head(tag("title")(indexTitle), defMeta, styleSheets, skin(color))
+  def pageHead(title: String = "Data CENTRAL", color: CSSskin = Skins.blue): TypedTag[String] = head(tag("title")(title), defMeta, styleSheets, skin(color))
 
-  def defBody(content: Seq[Modifier], scripts: Seq[Modifier]): TypedTag[String] = body(cls := "hold-transition skin-blue sidebar-mini")(
-    div(cls := "wrapper")(content),
-    scripts
+  def pageBody(content: Seq[TypedTag[String]] = Seq(pageHeader, mainSidebar, mainContent, mainFoot, controlSidebar), scripts: Seq[TypedTag[String]] = scripts): TypedTag[String] = body(cls := "hold-transition skin-blue sidebar-mini")(div(cls := "wrapper")(content), scripts)
+
+  def mainSidebar: TypedTag[String] = {}
+
+  def mainContent: TypedTag[String] = {}
+
+  def mainFoot: TypedTag[String] = {}
+
+  def controlSidebar: TypedTag[String] = {}
+
+  def pageHeader: TypedTag[String] = header(cls := "main-header")(logo(), headerNavigator())
+
+  def logo: TypedTag[String] = simpleClickTo(clss = "logo", display = Seq(
+    span(cls := "logo-mini")(b("D"), "CTL"),
+    span(cls := "logo-lg")(b("Data"), "CENTRAL")))
+
+  def simpleClickTo(url: String = "javascript:alert('This clickable object should be linked to somewhere. Just check out the document for a tags and href to link this to the main page. This popup is just a place holder for now.');",
+                    clss: String = "noclass",
+                    display: Frag): TypedTag[String] = a(href := url, cls := clss)(display)
+
+  def headerNavigator(sidebar: Seq[TypedTag[String]] = Seq(dropdown(), dropdownNotifications(), dropdownTasks, account, controlSidebarToggle)): TypedTag[String] = tag("nav")(cls := "navbar navbar-static-top")(
+    a(href := topOfPage, cls := "sidebar-toggle", BootStrapToggles.offcanvas, role := "button")(
+      span(cls := "sr-only")("Toggle navigation")
+    ),
+    div(cls := "navbar-custom-menu")(
+      ul(cls := "nav navbar-nav")(sidebar)
+    )
   )
 
-  def controlSidebar = {
-    <aside class="control-sidebar control-sidebar-dark">
-      <!-- Create the tabs -->
-      <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-        <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
-        <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
-      </ul>
-      <!-- Tab panes -->
-      <div class="tab-content">
-        <!-- Home tab content -->
-        <div class="tab-pane" id="control-sidebar-home-tab">
-          <h3 class="control-sidebar-heading">Recent Activity</h3>
-          <ul class="control-sidebar-menu">
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+  val imgFolder = "dist/img/"
 
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+  def message(msg: String = "Do we need ScalaJS, or we are fine with ScalaTags only?", time: LocalDateTime = LocalDateTime.now().plusSeconds(-5), sender: String = "Data Engineer", icon: String = "user2-160x160.jpg"): TypedTag[String] = {
+    val timeString: String = time2String
 
-                  <p>Will be 23 on April 24th</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-user bg-yellow"></i>
+    def time2String = {
+      val now = LocalDateTime.now()
+      require(time.isBefore(now), s"You've got a message from the future $time!!!")
+      val duration = Duration.between(time, now)
+      val days = duration.toDays
+      val hours = duration.minusDays(days).toHours
+      val minutes = duration.minusHours(hours + days * 24).toMinutes
+      val seconds = duration.minusMinutes(minutes + (hours + days * 24) * 60).getSeconds
 
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+      def numToLabel(input: (Long, String)): String = input._1 match {
+        case 0 => ""
+        case 1 => s"1 ${input._2}"
+        case n => s"$n ${input._2}s"
+      }
 
-                  <p>New phone +1(800)555-1234</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+      (days, "day") :: (hours, "hour") :: (minutes, "minute") :: (seconds, "second") :: Nil map numToLabel mkString " " removeMultipleSpaces
+    }
 
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
-
-                  <p>nora@example.com</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-file-code-o bg-green"></i>
-
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
-
-                  <p>Execution time 5 seconds</p>
-                </div>
-              </a>
-            </li>
-          </ul>
-          <!-- /.control-sidebar-menu -->
-
-          <h3 class="control-sidebar-heading">Tasks Progress</h3>
-          <ul class="control-sidebar-menu">
-            <li>
-              <a href="javascript:void(0)">
-                <h4 class="control-sidebar-subheading">
-                  Custom Template Design
-                  <span class="label label-danger pull-right">70%</span>
-                </h4>
-
-                <div class="progress progress-xxs">
-                  <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <h4 class="control-sidebar-subheading">
-                  Update Resume
-                  <span class="label label-success pull-right">95%</span>
-                </h4>
-
-                <div class="progress progress-xxs">
-                  <div class="progress-bar progress-bar-success" style="width: 95%"></div>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <h4 class="control-sidebar-subheading">
-                  Laravel Integration
-                  <span class="label label-warning pull-right">50%</span>
-                </h4>
-
-                <div class="progress progress-xxs">
-                  <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-                <h4 class="control-sidebar-subheading">
-                  Back End Framework
-                  <span class="label label-primary pull-right">68%</span>
-                </h4>
-
-                <div class="progress progress-xxs">
-                  <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
-                </div>
-              </a>
-            </li>
-          </ul>
-          <!-- /.control-sidebar-menu -->
-
-        </div>
-        <!-- /.tab-pane -->
-        <!-- Stats tab content -->
-        <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-        <!-- /.tab-pane -->
-        <!-- Settings tab content -->
-        <div class="tab-pane" id="control-sidebar-settings-tab">
-          <form method="post">
-            <h3 class="control-sidebar-heading">General Settings</h3>
-
-            <div class="form-group">
-              <label class="control-sidebar-subheading">
-                Report panel usage
-                <input type="checkbox" class="pull-right" checked>
-                </label>
-
-                <p>
-                  Some information about this general settings option
-                </p>
-              </div>
-              <!-- /.form-group -->
-
-              <div class="form-group">
-                <label class="control-sidebar-subheading">
-                  Allow mail redirect
-                  <input type="checkbox" class="pull-right" checked>
-                  </label>
-
-                  <p>
-                    Other sets of options are available
-                  </p>
-                </div>
-                <!-- /.form-group -->
-
-                <div class="form-group">
-                  <label class="control-sidebar-subheading">
-                    Expose author name in posts
-                    <input type="checkbox" class="pull-right" checked>
-                    </label>
-
-                    <p>
-                      Allow the user to show his name in blog posts
-                    </p>
-                  </div>
-                  <!-- /.form-group -->
-
-                  <h3 class="control-sidebar-heading">Chat Settings</h3>
-
-                  <div class="form-group">
-                    <label class="control-sidebar-subheading">
-                      Show me as online
-                      <input type="checkbox" class="pull-right" checked>
-                      </label>
-                    </div>
-                    <!-- /.form-group -->
-
-                    <div class="form-group">
-                      <label class="control-sidebar-subheading">
-                        Turn off notifications
-                        <input type="checkbox" class="pull-right">
-                        </label>
-                      </div>
-                      <!-- /.form-group -->
-
-                      <div class="form-group">
-                        <label class="control-sidebar-subheading">
-                          Delete chat history
-                          <a href="javascript:void(0)" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
-                        </label>
-                      </div>
-                      <!-- /.form-group -->
-                    </form>
-                  </div>
-                  <!-- /.tab-pane -->
-                </div>
-              </aside>
-              <div class="control-sidebar-bg"></div>
+    li(
+      a(href := topOfPage)(
+        div(cls := "pull-left")(
+          img(src := imgFolder + icon, cls := "img-circle", alt := "User Icon")
+        ),
+        h4(
+          sender,
+          small(i(cls := FontAwesomeIcons.clock), s"$timeString ago")
+        ),
+        p(msg)
+      )
+    )
   }
 
+  def notification(url: String = topOfPage, notificationType: String = FontAwesomeNotifications.users, msg: String = "5 new members joined today"): TypedTag[String] = li(a(href := url)(i(cls := notificationType), s" ${msg.trim}"))
+
+  def dropdown(items: Seq[TypedTag[String]], itemType: String, icon: String, label: String, dropdownType: String): TypedTag[String] =
+    li(cls := dropdownType)(
+      a(href := topOfPage, cls := BootStrapDropdown.toggle, BootStrapToggles.dropdown)(
+        i(cls := icon),
+        span(cls := label)(items.length)
+      ),
+      ul(cls := BootStrapDropdown.menu)(
+        li(BootStrapSimple.header)(stringFrag(s"You have ${items.length} ${itemType}s")),
+        li(ul(BootStrapSimple.menu)(items)),
+        li(BootStrapSimple.footer)(simpleClickTo(display = s"See all ${itemType}s"))
+      )
+    )
+
+  def dropdownMessages(messages: Seq[TypedTag[String]] = Seq(message())): TypedTag[String] = dropdown(
+    items = messages, itemType = "message", icon = FontAwesomeIcons.envelope, label = BootstrapLabel.success, dropdownType = DropdownMenus.messages
+  )
+
+  def dropdownNotifications(notifications: Seq[TypedTag[String]] = Seq(notification())): TypedTag[String] = dropdown(
+    items = notifications, itemType = "notification", icon = FontAwesomeIcons.bell, label = BootstrapLabel.warning, dropdownType = DropdownMenus.notifications
+  )
+
+  def dropdownTasks(tasks: Seq[TypedTag[String]] = Seq(task())): TypedTag[String] = dropdown(
+    items = tasks, itemType = "task", icon = FontAwesomeIcons.flag, label = BootstrapLabel.danger, dropdownType = DropdownMenus.tasks
+  )
+
+  def account(url: String = topOfPage, icon: String = "user2-160x160.jpg", name: String = "Alexander Pierce", jobTitle: String = "Data Engineer", startDate: LocalDate = LocalDate.now.minusDays(Random.nextInt(1000))): TypedTag[String] = li(cls := DropdownMenus.account)(
+    a(href := url, cls := BootStrapDropdown.toggle, BootStrapToggles.dropdown)(
+      img(src := imgFolder + icon, cls := "user-image", alt := "User Image"),
+      span(cls := "hidden-xs")(name)
+    ),
+    ul(cls := BootStrapDropdown.menu)(
+      li(cls := "user-header")(
+        img(src := imgFolder + icon, cls := "img-circle", alt := "User Image"),
+        p(
+          s"$name - $jobTitle",
+          small(s"Member since ${startDate.format(DateTimeFormatter.ofPattern("MMM. yyyy"))}")
+        ) // keep working here
+      )
+    )
+  )
+
+  def task(url: String = topOfPage, msg: String = "Deploy the sparkjob-server", completion: Int = Random.nextInt(100)) = li(
+    a(href := url)(
+      h3(
+        msg, small(cls := AlignText.right)(s"$completion%")
+      ),
+      div(cls := "progress xs")(
+        div(cls := "progress-bar progress-bar-aqua", style := s"width: $completion%", role := "progressbar", aria.valuenow := completion.toString, aria.valuemin := "0", aria.valuemax := "100")(
+          span(cls := "sr-only")(s"$completion% Complete")
+        )
+      )
+    )
+  )
+
+  object AlignText {
+    val right = "pull-right"
+    val left = "pull-left"
+  }
+
+  object DropdownMenus {
+    val messages: String = "dropdown messages-menu"
+    val notifications: String = "dropdown notifications-menu"
+    val tasks: String = "dropdown tasks-menu"
+    val account: String = "dropdown user user-menu"
+  }
+
+  object FontAwesomeIcons {
+    val envelope = "fa fa-envelope-o"
+    val bell = "fa fa-bell-o"
+    val clock = "fa fa-clock-o"
+    val flag = "fa fa-flag-o"
+  }
+
+  object FontAwesomeNotifications {
+    val warning = "fa fa-warning text-yellow"
+    val users = "fa fa-users text-aqua"
+    val user = "fa fa-user text-red"
+    val shopping = "fa fa-shopping-cart text-green"
+  }
+
+  object BootstrapLabel {
+    val success = "label label-success"
+    val warning = "label label-warning"
+    val danger = "label label-danger"
+  }
+
+  object BootStrapDropdown {
+    val toggle = "dropdown-toggle"
+    val menu = "dropdown-menu"
+  }
+
+  object BootStrapSimple {
+    val header = cls := "header"
+    val menu = cls := "menu"
+    val footer = cls := "footer"
+  }
+
+  def controlSidebarToggle: TypedTag[String] = li(a(href := topOfPage, BootStrapToggles.sidebarControl)(i(cls := "fa fa-gears")))
+
 }
+
+
+

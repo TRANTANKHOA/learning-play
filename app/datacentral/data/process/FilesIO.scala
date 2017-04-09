@@ -1,4 +1,4 @@
-package common
+package datacentral.data.process
 
 import javax.inject.Inject
 

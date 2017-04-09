@@ -1,4 +1,4 @@
-package common
+package controllers
 
 import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
 import play.api.mvc.Codec

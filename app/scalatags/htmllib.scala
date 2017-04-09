@@ -59,8 +59,7 @@ object htmllib {
     )
   )
 
-  def page(title: String, scripts: Seq[Modifier], content: Seq[Modifier]): TypedTag[String] =
-    html(
+  def simplePage(title: String, scripts: Seq[Modifier], content: Seq[Modifier]): TypedTag[String] = html(
       head(scripts),
       body(
         h1(title),
@@ -69,6 +68,5 @@ object htmllib {
     )
 
   def addStyleSheetAt(url:String): TypedTag[String] = link(rel:="stylesheet", href:=url)
-
 
 }

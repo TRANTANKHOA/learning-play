@@ -1,4 +1,4 @@
-package datacentral.data.test
+package datacentral.data.testUtils
 
 import datacentral.data.warehouse.{Dataset, SparkAPI}
 import org.apache.spark.sql.types.StructType

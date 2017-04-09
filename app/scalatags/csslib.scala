@@ -1,5 +1,0 @@
-package scalatags
-
-object csslib {
-
-}

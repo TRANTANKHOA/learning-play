@@ -1,6 +1,6 @@
 package scalatags.LTETemplates
 
-import common.Reflections
+import datacentral.data.process.Reflections
 
 import scalatags.Text.TypedTag
 import scalatags.Text.all._
