@@ -16,7 +16,10 @@ trait SmartLogger {
   }
 
   implicit class ThrowableHelper(e: Throwable) {
-    def getHyperAnnaStackTrace: Array[StackTraceElement] = e.getStackTrace.filter(_.toString.contains("hyperanna"))
+    def getStackTraces: Array[StackTraceElement] = e.getStackTrace.filter(_.toString.contains("datacentral")) match {
+      case Array.empty  => e.getStackTrace
+      case some => some
+    }
 
     def saveTimeOutReport(implicit currentNotes: NoteTaker) {
       notepad.copyFrom(currentNotes)
@@ -34,7 +37,7 @@ trait SmartLogger {
     def saveToNotePad {
       notepad.addLap(s"Get ${e.getClassName} at $getNextCallerName")
       val message: String = e.getMessage
-      val stackTrace: Array[StackTraceElement] = e.getHyperAnnaStackTrace
+      val stackTrace: Array[StackTraceElement] = e.getStackTraces
       notepad.add(
         s"Encountered $message\n" +
           s"at system time = ${LocalDateTime.now(ZoneId.of("Australia/Sydney")).toString}\n" +
@@ -45,7 +48,7 @@ trait SmartLogger {
   // Do not use inside a Future
   def getCallers: Array[String] = Thread.currentThread
     .getStackTrace
-    .filter(_.toString.contains("hyperanna"))
+    .filter(_.toString.contains("datacentral"))
     .map(_.getMethodName)
 
   def getCallerName: String = getCallers.apply(4)
