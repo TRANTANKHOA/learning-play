@@ -6,7 +6,7 @@
 GET        /                        controllers.Home.index
 
 # Loading a static page
-GET        /dashboard               controllers.Assets.at(path="/public/LTETemplates", file="index.html")
+GET        /LTETemplates            controllers.Assets.at(path="/public/LTETemplates", file="index.html")
 GET        /bootstrap/*resrc        controllers.Assets.at(path="/public/LTETemplates/bootstrap/", resrc)
 GET        /plugins/*resrc          controllers.Assets.at(path="/public/LTETemplates/plugins/", resrc)
 GET        /dist/*resrc             controllers.Assets.at(path="/public/LTETemplates/dist/", resrc)

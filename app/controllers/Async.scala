@@ -3,7 +3,6 @@ package controllers
 import javax.inject._
 
 import akka.actor.ActorSystem
-import common.ControllerWriters
 import play.api.mvc._
 
 import scala.concurrent.duration._
