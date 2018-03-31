@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject._
 
-import common.ControllerWriters
 import play.api.mvc._
 import services.Counter
 

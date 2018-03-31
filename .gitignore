@@ -10,6 +10,9 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# Personal files
+*.pdf
+
 # Package Files #
 *.jar
 *.war
@@ -27,7 +30,7 @@ hs_err_pid*
 
 # Ignore Play! working directory #
 logs
-target
+target/
 /.idea
 /.idea_modules
 /.classpath
