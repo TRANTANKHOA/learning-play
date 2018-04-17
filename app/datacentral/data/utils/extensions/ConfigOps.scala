@@ -3,12 +3,19 @@ package utils.extensions
 
 import java.sql.Date
 
-import com.typesafe.config.{Config, ConfigMergeable, ConfigObject}
-import datacentral.data.utils.extensions.TryExtensions._
+import com.typesafe.config._
+import datacentral.data.utils.extensions.TryExtensions.ListTry
+import pureconfig.error.ConfigReaderFailures
 
 import scala.collection.JavaConverters._
-import scala.util.{Success, Try}
+import scala.util._
 
+final class PureConfigOps[A](self: Either[ConfigReaderFailures, A]) {
+  def toTry: Try[A] = self match {
+    case Right(a) => Success(a)
+    case Left(configReaderFailures) => Failure(new Exception(configReaderFailures.toList.mkString("\n")))
+  }
+}
 
 final class ConfigOps(val self: Config) extends AnyVal {
   def hasNonEmptyList(path: String): Boolean =

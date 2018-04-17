@@ -11,5 +11,5 @@ trait ConfigProvider {
 }
 
 object ConfigProvider {
-  lazy val defaultConfig: Config = ConfigFactory.load()
+  def defaultConfig: Config = ConfigFactory.load()
 }

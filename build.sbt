@@ -22,6 +22,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).settings(
     "com.typesafe.akka" % "akka-actor_2.11" % "2.5.3",
     "com.typesafe.slick" %% "slick" % "3.2.0",
     "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
+    "com.github.pureconfig" %% "pureconfig" % "0.9.0",
     "org.scalaz" % "scalaz-core_2.11" % "7.2.14",
     "org.scalaz" % "scalaz-concurrent_2.11" % "7.2.14"),
   printKeys := {
